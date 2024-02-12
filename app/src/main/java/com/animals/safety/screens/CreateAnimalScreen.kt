@@ -2,29 +2,39 @@ package com.animals.safety.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.animals.safety.R
 import com.animals.safety.data.Animal
 import com.animals.safety.data.AnimalData
@@ -42,14 +52,13 @@ fun CreateAnimalScreen(
   onSaveClick:() -> Unit
 ) {
   val scope = rememberCoroutineScope()
-  val scrollState = rememberScrollState()
   val snackbarHostState = remember { SnackbarHostState() }
 
-  val name by remember { mutableStateOf("") }
-  val breed by remember { mutableStateOf(Breed.entries[0]) }
-  val age by remember { mutableStateOf("") }
-  val weight by remember { mutableStateOf("") }
-  val height by remember { mutableStateOf("") }
+  val name = remember { mutableStateOf("") }
+  val breed = remember { mutableStateOf(Breed.entries[0]) }
+  val age = remember { mutableStateOf("") }
+  val weight = remember { mutableStateOf("") }
+  val height = remember { mutableStateOf("") }
 
   Scaffold(
     modifier = modifier,
@@ -77,7 +86,7 @@ fun CreateAnimalScreen(
     floatingActionButton = {
       ExtendedFloatingActionButton(
         onClick = {
-          if (verifyAndCreateAnimal(name, breed, age, weight, height, snackbarHostState, scope)) {
+          if (verifyAndCreateAnimal(name.value, breed.value, age.value, weight.value, height.value, snackbarHostState, scope)) {
             onSaveClick()
           }
         }
@@ -88,14 +97,14 @@ fun CreateAnimalScreen(
       }
     }
   ) { contentPadding ->
-    Column(
-      modifier = modifier
-        .fillMaxSize()
-        .padding(contentPadding)
-        .verticalScroll(scrollState)
-    ) {
-      CreateAnimal()
-    }
+    CreateAnimal(
+      modifier = Modifier.padding(contentPadding),
+      name = name,
+      breed = breed,
+      age = age,
+      weight = weight,
+      height = height
+    )
   }
 }
 
@@ -164,18 +173,116 @@ fun verifyAndCreateAnimal(
   return true
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreateAnimal(
   modifier: Modifier = Modifier,
-)
-{
-  //TODO: A compléter
+  name: MutableState<String>,
+  age: MutableState<String>,
+  weight: MutableState<String>,
+  height: MutableState<String>,
+  breed: MutableState<Breed>
+) {
+  val scrollState = rememberScrollState()
+  var isExpanded by remember { mutableStateOf(false) }
+
+  Column(
+    modifier = modifier
+      .padding(bottom = 88.dp, top = 16.dp, start = 16.dp, end = 16.dp)
+      .fillMaxSize()
+      .verticalScroll(scrollState)
+  ) {
+    OutlinedTextField(
+      modifier = Modifier
+        .padding(top = 16.dp)
+        .fillMaxWidth(),
+      value = name.value,
+      onValueChange = { name.value = it },
+      label = { Text(stringResource(id = R.string.hint_name)) },
+      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+      singleLine = true
+    )
+    ExposedDropdownMenuBox(
+      modifier = Modifier
+        .padding(top = 16.dp)
+        .fillMaxWidth(),
+      expanded = isExpanded,
+      onExpandedChange = { isExpanded = it }
+    ) {
+      OutlinedTextField(
+        modifier = Modifier
+          .fillMaxWidth()
+          .menuAnchor(),
+        value = stringResource(id = breed.value.translatedName),
+        onValueChange = {},
+        readOnly = true,
+        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
+        label = { Text(text = stringResource(id = R.string.hint_breed)) },
+      )
+      ExposedDropdownMenu(
+        expanded = isExpanded,
+        onDismissRequest = { isExpanded = false }
+      ) {
+        Breed.entries.forEach {
+          DropdownMenuItem(
+            text = { Text(text = stringResource(id = it.translatedName)) },
+            onClick = {
+              breed.value = it
+              isExpanded = false
+            }
+          )
+        }
+      }
+    }
+    OutlinedTextField(
+      modifier = Modifier
+        .padding(top = 16.dp)
+        .fillMaxWidth(),
+      value = age.value,
+      onValueChange = { age.value = it },
+      label = { Text(stringResource(id = R.string.hint_age)) },
+      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+      singleLine = true
+    )
+    OutlinedTextField(
+      modifier = Modifier
+        .padding(top = 16.dp)
+        .fillMaxWidth(),
+      value = weight.value,
+      onValueChange = { weight.value = it },
+      label = { Text(stringResource(id = R.string.hint_weight)) },
+      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+      singleLine = true
+    )
+    OutlinedTextField(
+      modifier = Modifier
+        .padding(top = 16.dp)
+        .fillMaxWidth(),
+      value = height.value,
+      onValueChange = { height.value = it },
+      label = { Text(stringResource(id = R.string.hint_height)) },
+      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+      singleLine = true
+    )
+  }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun CreateAnimalPreview() {
   AimantsDanimauxTheme(dynamicColor = false) {
-    CreateAnimal()
+    val name = remember { mutableStateOf("Milou") }
+    val breed = remember { mutableStateOf(Breed.entries[0]) }
+    val age = remember { mutableStateOf("6") }
+    val weight = remember { mutableStateOf("473.6") }
+    val height = remember { mutableStateOf("14.7") }
+
+    CreateAnimal(
+      name = name,
+      age = age,
+      weight = weight,
+      height = height,
+      breed = breed
+    )
   }
 }
