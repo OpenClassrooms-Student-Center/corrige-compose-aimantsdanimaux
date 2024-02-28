@@ -1,5 +1,6 @@
 package com.animals.safety.screens
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +53,7 @@ fun CreateAnimalScreen(
   onBackClick: () -> Unit,
   onSaveClick:() -> Unit
 ) {
+  val context = LocalContext.current
   val scope = rememberCoroutineScope()
   val snackbarHostState = remember { SnackbarHostState() }
 
@@ -86,7 +89,7 @@ fun CreateAnimalScreen(
     floatingActionButton = {
       ExtendedFloatingActionButton(
         onClick = {
-          if (verifyAndCreateAnimal(name.value, breed.value, age.value, weight.value, height.value, snackbarHostState, scope)) {
+          if (verifyAndCreateAnimal(name.value, breed.value, age.value, weight.value, height.value, snackbarHostState, scope, context)) {
             onSaveClick()
           }
         }
@@ -115,12 +118,13 @@ fun verifyAndCreateAnimal(
   weight: String,
   height: String,
   snackbarHostState: SnackbarHostState,
-  scope: CoroutineScope
+  scope: CoroutineScope,
+  context: Context
 ): Boolean
 {
   if (name.isBlank()) {
     scope.launch {
-      snackbarHostState.showSnackbar("The name must not be empty")
+      snackbarHostState.showSnackbar(context.getString(R.string.issue_name_empty))
     }
 
     return false;
@@ -131,7 +135,7 @@ fun verifyAndCreateAnimal(
     animalAge = age.toInt()
   } catch (e: NumberFormatException) {
     scope.launch {
-      snackbarHostState.showSnackbar("The age is not valid")
+      snackbarHostState.showSnackbar(context.getString(R.string.issue_invalid_age))
     }
 
     return false;
@@ -142,7 +146,7 @@ fun verifyAndCreateAnimal(
     animalWeight = weight.toFloat()
   } catch (e: NumberFormatException) {
     scope.launch {
-      snackbarHostState.showSnackbar("The weight is not valid")
+      snackbarHostState.showSnackbar(context.getString(R.string.issue_invalid_weight))
     }
 
     return false;
@@ -153,7 +157,7 @@ fun verifyAndCreateAnimal(
     animalHeight = height.toFloat()
   } catch (e: NumberFormatException) {
     scope.launch {
-      snackbarHostState.showSnackbar("The height is not valid")
+      snackbarHostState.showSnackbar(context.getString(R.string.issue_invalid_height))
     }
 
     return false;
