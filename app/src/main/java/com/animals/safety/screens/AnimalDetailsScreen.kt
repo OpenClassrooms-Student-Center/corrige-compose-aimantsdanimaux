@@ -2,7 +2,6 @@ package com.animals.safety.screens
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,7 +57,7 @@ fun AnimalDetailsScreen(
           }) {
             Icon(
               imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-              contentDescription = "Go back"
+              contentDescription = stringResource(id = R.string.contentDescription_go_back)
             )
           }
         }
@@ -87,7 +86,7 @@ private fun AnimalDetails(
         modifier = Modifier.fillMaxWidth(),
         contentScale = ContentScale.Crop,
         painter = painterResource(animal.breed.cover),
-        contentDescription = "cover"
+        contentDescription = stringResource(id = R.string.contentDescription_avatar)
       )
       Text(
         modifier = Modifier

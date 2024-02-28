@@ -65,7 +65,7 @@ fun HomeScreen(
       ) {
         Icon(
           imageVector = Icons.Filled.Add,
-          contentDescription = "Add an animal"
+          contentDescription = stringResource(id = R.string.contentDescription_add_animal)
         )
       }
     }
@@ -117,7 +117,7 @@ private fun HomeCell(
         .width(54.dp)
         .height(54.dp),
       painter = painterResource(animal.breed.cover),
-      contentDescription = "cover"
+      contentDescription = stringResource(id = R.string.contentDescription_avatar)
     )
     Column(
       modifier = Modifier.padding(start = 16.dp),
